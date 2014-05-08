@@ -1,0 +1,133 @@
+#%RAML 0.8
+title: stardog core api
+version: v3
+baseUri: http://0.0.0.0:582/api/{version}
+
+/{kb}:
+  displayName: knowledge base actions
+  uriParameters:
+    kb:
+      description: the knowledge base name
+  /size:
+    description: Execute a SPARQL query
+    post:
+      description: Execute a SPARQL query
+
+  /query:
+    description: Execute a SPARQL query
+    post:
+      queryParameters:
+        query:
+          required: true
+        baseURI:
+          required: false
+        limit:
+          required: false
+        offset:
+          required: false
+    get:
+      queryParameters:
+        query:
+          required: true
+        baseURI:
+          required: false
+        limit:
+          required: false
+        offset:
+          required: false
+  /transaction:
+    /begin:
+      description: Begin a new transaction against the database.
+      post:
+    /rollback/{tid}:
+      description: Rollback the specified transaction.
+      uriParameters:
+        tid:
+          type: string
+          required: true
+    /commit/{tid}:
+      description: Commit the specified transaction..
+      uriParameters:
+        tid:
+          type: string
+          required: true
+  /explain:
+    post:
+      description: Return the execution plan for the specified query
+
+  /{tid}:
+    uriParameters:
+        tid:
+          description: transaction parameter id
+    /add:
+      description: Add data to the database in the specified transaction.
+      post:
+        description: Execute a SPARQL query
+        queryParameters:
+          graph-uri:
+            type: string
+
+    /remove:
+      description: Remove data from the database in the specified transaction.
+      post:
+        queryParameters:
+          graph-uri:
+            type: string
+    /query:
+      description: Execute a SPARQL Query
+      post:
+        description: Execute a SPARQL Query
+        queryParameters:
+          query:
+            required: true
+          baseURI:
+            required: false
+          limit:
+            required: false
+          offset:
+            required: false
+      get:
+        description: Execute a SPARQL Query
+        queryParameters:
+          query:
+            required: true
+          baseURI:
+            required: false
+          limit:
+            required: false
+          offset:
+            required: false
+    /clear:
+      description: Clear the entire database within the current transaction. Optionally takes the parameter 'graph-uri' which cah be used to specify that only that named graph should be cleared.
+      post:
+        queryParameters:
+          graph-uri:
+            required: false
+
+  /reasoning:
+    description: Reasoning API
+    /{tid}:
+      uriParameters:
+        tid:
+          description: transaction parameter id
+      /explain:
+        description: Provide the explanation for an inference within the transaction.
+        post:
+      /explain/incosistency:
+        description: Return the explanation for why the database is inconsistent wrt to the TBox within the specified transaction.
+        post:
+          queryParameters:
+            graph-uri:
+    /explain:
+      description: Provide the explanation for an inference. The axiom to be explained must be in RDF and the resulting explanation is returned as Turtle.
+      post:
+    /explain/incosistency:
+        description: Return the explanation for why the database is inconsistent wrt to the TBox within the specified transaction.
+        get:
+          queryParameters:
+            graph-uri:
+    /consistency:
+      description: Checks whether or not the data in the database is consistent wrt to the TBox.
+      get:
+        queryParameters:
+          graph-uri:
