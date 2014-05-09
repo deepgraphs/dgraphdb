@@ -1,0 +1,140 @@
+#%RAML 0.8
+title: stardog admin api
+version: v0.2
+baseUri: http://0.0.0.0:582/api/{version}
+
+/admin/shutdown:
+  description: Shutdown the Stardog server.
+  post:
+
+/admin/databases:
+  get:
+    description: List all the databases in the server
+  post:
+    description: Create a new database
+  /{kb}:
+    uriParameters:
+      kb:
+        description: the id of the knowledge base
+        displayName: knowledge base
+        example: 34
+        type: integer
+        required: true
+    delete:
+      description: Delete a database
+    /optimize:
+      put:
+        description: Optimize the index of a database.
+    /copy:
+      put:
+        description: Make a copy of a database under another name.
+        queryParameters:
+          to:
+            description: The new name of the database
+    /options:
+      post:
+        description: Set the value of metadata options for a database.
+      put:
+        description: Return the value of metadata options for a database.
+    /migrate:
+      put:
+        description: Migrate the contents of a database to the latest format.
+    /online:
+      put:
+        description: Bring a database online.
+    /offline:
+      put:
+        description: Bring a database offline.
+
+/admin/users:
+  get:
+    description: Return the list of all the users
+  post:
+    description: Add a new user
+  /valid:
+    get:
+      description: Authenticate a user.
+  /{user}:
+    uriParameters:
+      user:
+        description: the user id.
+        example: 42
+    delete:
+      description: Remove a user.
+    /pwd:
+      put:
+        description: Change the password of an existing user.
+    /enabled:
+      put:
+        description: Enable a user.
+      get:
+        description: Return whether or not a user is enabled.
+    /superuser:
+        get:
+          description: Return whether or not a user is a superuser.
+    /roles:
+      post:
+        description: Adds a new role to a user.
+      get:
+        description: List the roles a user holds.
+      put:
+        description: Set the roles of a user.
+      /{role}:
+        uriParameters:
+          role:
+        delete:
+          description: Remove a role from a user.
+    /{role}/users:
+      get:
+        description: List the users which hold the specified role.
+
+/admin/roles:
+  get:
+    description: Return the list of all roles.
+  post:
+    description: Add a new role.
+  /{role}:
+    delete:
+      description: Delete a role.
+      queryParameters:
+        force:
+          required: false
+
+/admin/queries:
+  get:
+    description: List all running queries.
+  /{queryid}:
+    uriParameters:
+      queryid:
+        example: 1223
+        required: true
+        description: the query id.
+    delete:
+      description: Kill the specified query.
+    get:
+      description: Get information about a running query.
+
+/admin/permissions:
+  /role/{role}:
+    uriParameters:
+      role:
+    get:
+      description: List the permissions associated with the specified role.
+    put:
+      description: Assign a new permission to a role.
+    delete:
+      description: Remove a permission from a role.
+  /user/{user}:
+    uriParameters:
+      user:
+    get:
+      description: List the permissions assigned to the specified user.
+    put:
+      description: Assin a new permission to a user.
+    delete:
+      description: Remove a permission from a user.
+  /effective/user/{user}:
+    uriParameters:
+      user:
+    get:
+      description: List the effective permissions held by the specified user. This is all permissions they hold explicitly plus all the permissions inherited from roles they hold.

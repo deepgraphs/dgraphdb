@@ -1,0 +1,33 @@
+#%RAML 0.8
+title: stardog reasoning api
+version: v0.2
+baseUri: http://0.0.0.0:582/api/{version}
+
+
+/reasoning:
+    description: Reasoning API
+    /{tid}:
+      uriParameters:
+        tid:
+          description: transaction parameter id
+      /explain:
+        description: Provide the explanation for an inference within the transaction.
+        post:
+      /explain/incosistency:
+        description: Return the explanation for why the database is inconsistent wrt to the TBox within the specified transaction.
+        post:
+          queryParameters:
+            graph-uri:
+    /explain:
+      description: Provide the explanation for an inference. The axiom to be explained must be in RDF and the resulting explanation is returned as Turtle.
+      post:
+    /explain/incosistency:
+        description: Return the explanation for why the database is inconsistent wrt to the TBox within the specified transaction.
+        get:
+          queryParameters:
+            graph-uri:
+    /consistency:
+      description: Checks whether or not the data in the database is consistent wrt to the TBox.
+      get:
+        queryParameters:
+          graph-uri:

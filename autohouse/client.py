@@ -1,14 +1,16 @@
 __author__ = 'mpetyx'
 
-import requests
-import httplib, urllib
+import httplib
+import urllib
 from urlparse import urlparse
 from xml.dom import pulldom
 import re
 
+import requests
+
+
 __version__ = "0.1"
 __author__ = "Michael Petychakis"
-
 
 try:
     import json
@@ -20,18 +22,18 @@ import struct
 USER_AGENT = "stardog-client/%s" % __version__
 
 CONTENT_TYPE = {
-                 'turtle' : "application/turtle" ,
-                 'n3' :"application/n3",
-                 'rdfxml' : "application/rdf+xml" ,
-                 'ntriples' : "application/n-triples" ,
-                 'xml' : "application/xml"
-                }
+    'turtle': "application/turtle",
+    'n3': "application/n3",
+    'rdfxml': "application/rdf+xml",
+    'ntriples': "application/n-triples",
+    'xml': "application/xml"
+}
 
 RESULTS_TYPES = {
-                 'xml' : "application/sparql-results+xml" ,
-                 'json' : "application/sparql-results+json",
-                 'binary-table': "application/x-binary-rdf-results-table"
-                 }
+    'xml': "application/sparql-results+xml",
+    'json': "application/sparql-results+json",
+    'binary-table': "application/x-binary-rdf-results-table"
+}
 
 REASONING_TYPES = ["DL", "EL", "QL", "RL", "RDFS", None]
 
@@ -50,18 +52,18 @@ XSD_TIME = 'http://www.w3.org/2001/XMLSchema#time'
 XSD_BOOLEAN = 'http://www.w3.org/2001/XMLSchema#boolean'
 
 datatype_dict = {
-                 '': '',
-                 XSD_STRING : XSD_STRING,
-                 XSD_INTEGER : XSD_INTEGER,
-                 XSD_LONG : XSD_LONG,
-                 XSD_DOUBLE : XSD_DOUBLE,
-                 XSD_FLOAT : XSD_FLOAT,
-                 XSD_DECIMAL : XSD_DECIMAL,
-                 XSD_DATETIME : XSD_DATETIME,
-                 XSD_DATE : XSD_DATE,
-                 XSD_TIME : XSD_TIME,
-                 XSD_BOOLEAN : XSD_BOOLEAN
-                 }
+    '': '',
+    XSD_STRING: XSD_STRING,
+    XSD_INTEGER: XSD_INTEGER,
+    XSD_LONG: XSD_LONG,
+    XSD_DOUBLE: XSD_DOUBLE,
+    XSD_FLOAT: XSD_FLOAT,
+    XSD_DECIMAL: XSD_DECIMAL,
+    XSD_DATETIME: XSD_DATETIME,
+    XSD_DATE: XSD_DATE,
+    XSD_TIME: XSD_TIME,
+    XSD_BOOLEAN: XSD_BOOLEAN
+}
 
 _n3_quote_char = re.compile(r'[^ -~]|["\\]')
 _n3_quote_map = {
@@ -71,6 +73,7 @@ _n3_quote_map = {
     '\\': '\\\\',
 }
 
+
 def _n3_quote(string):
     def escape(m):
         ch = m.group()
@@ -78,7 +81,9 @@ def _n3_quote(string):
             return _n3_quote_map[ch]
         else:
             return "\\u%04x" % ord(ch)
+
     return '"' + _n3_quote_char.sub(escape, string) + '"'
+
 
 def Datatype(value):
     """
@@ -87,13 +92,14 @@ def Datatype(value):
     We make it look like a class, because it conceptually could be.
     Notice: This code is reused from sparql-client-0.9
     """
-    if value==None:
+    if value == None:
         r = None
     elif datatype_dict.has_key(value):
         r = datatype_dict[value]
     else:
         r = datatype_dict[value] = value
     return r
+
 
 class RDFTerm(object):
     """
@@ -119,6 +125,7 @@ class RDFTerm(object):
     def __repr__(self):
         return '<%s %s>' % (type(self).__name__, self.n3())
 
+
 class IRI(RDFTerm):
     """
     An RDF resource.
@@ -129,38 +136,40 @@ class IRI(RDFTerm):
         self.value = value
 
     def __str__(self):
-       return self.value.encode("unicode-escape")
+        return self.value.encode("unicode-escape")
 
     def __eq__(self, other):
-       if type(self) != type(other):
-           return False
-       if self.value == other.value: return True
-       return False
+        if type(self) != type(other):
+            return False
+        if self.value == other.value: return True
+        return False
 
     def n3(self):
         return '<%s>' % self.value
+
 
 class Literal(RDFTerm):
     """
     Literals. These can take a data type or a language code.
     Notice: This code is reused from sparql-client-0.9
     """
+
     def __init__(self, value, datatype=None, lang=None):
         self.value = unicode(value)
         self.lang = lang
         self.datatype = datatype
 
     def __eq__(self, other):
-       if type(self) != type(other):
-           return False
+        if type(self) != type(other):
+            return False
 
-       elif (self.value == other.value and
-             self.lang == other.lang and
-             self.datatype == other.datatype):
-           return True
+        elif (self.value == other.value and
+                      self.lang == other.lang and
+                      self.datatype == other.datatype):
+            return True
 
-       else:
-           return False
+        else:
+            return False
 
     def n3(self):
         n3_value = _n3_quote(self.value)
@@ -173,20 +182,22 @@ class Literal(RDFTerm):
 
         return n3_value
 
+
 class BlankNode(RDFTerm):
     """
     Blank node. Similar to 'IRI' but lacks a stable identifier.
     Notice: This code is reused from sparql-client-0.9
     """
+
     def __init__(self, value):
         self.value = value
 
     def __eq__(self, other):
-       if type(self) != type(other):
-           return False
-       if self.value == other.value:
-           return True
-       return False
+        if type(self) != type(other):
+            return False
+        if self.value == other.value:
+            return True
+        return False
 
     def n3(self):
         return '_:%s' % self.value
@@ -201,7 +212,6 @@ class BlankNode(RDFTerm):
 
 
 class DGAgent():
-
     def __init__(self, username, password, server):
 
         self.username = username
@@ -209,11 +219,11 @@ class DGAgent():
         self.server = server
 
     def set_database(self, database):
-            """
-            Set database to be used
-            """
-            self._database = database
-            self.__update_connection_string()
+        """
+        Set database to be used
+        """
+        self._database = database
+        self.__update_connection_string()
 
     def set_reasoning(self, reasoning):
         """
@@ -240,7 +250,8 @@ class DGAgent():
         self._method = method
 
     def __update_connection_string(self):
-        self._http_headers['SD-Connection-String'] = "reasoning=%s;kb=%s;persist=sync" % (self._reasoning, self._database)
+        self._http_headers['SD-Connection-String'] = "reasoning=%s;kb=%s;persist=sync" % (
+        self._reasoning, self._database)
 
     def query(self, sparql_query):
         """
@@ -251,7 +262,7 @@ class DGAgent():
 
         conn = httplib.HTTPConnection(self._server_hostname, self._server_port)
         params = {
-            "query" : sparql_query
+            "query": sparql_query
         }
         query_path = "/%s/query" % self._database
 
@@ -265,10 +276,10 @@ class DGAgent():
 
 
 class ResultParser(object):
-
     """
     Base class of all result parsers
     """
+
     def __init__(self):
         self._iter = None
 
@@ -323,8 +334,8 @@ class ResultParser(object):
             if num <= 0: return result
         return result
 
-class XMLResultParser(ResultParser):
 
+class XMLResultParser(ResultParser):
     """
     Parse the XML result
     Notice: This code is reused from sparql-client-0.9 with some modifications
@@ -395,8 +406,8 @@ class XMLResultParser(ResultParser):
                     #print "rtn:", len(vals), vals
                     yield vals
 
-class JSONResultParser(ResultParser):
 
+class JSONResultParser(ResultParser):
     """
     Parse the JSON result
     """
@@ -412,7 +423,7 @@ class JSONResultParser(ResultParser):
 
     def generator(self):
         for row in self.data:
-            for (key,value) in row.items():
+            for (key, value) in row.items():
                 if value['type'] == 'uri':
                     row[key] = IRI(value.get('value'))
                 elif value['type'] == 'typed-literal':
@@ -426,8 +437,8 @@ class JSONResultParser(ResultParser):
                     row[key] = BlankNode(value.get('value'))
             yield row
 
-class BinaryTableResultParser(ResultParser):
 
+class BinaryTableResultParser(ResultParser):
     """
     Parse the Binary result
     """
@@ -464,9 +475,10 @@ class BinaryTableResultParser(ResultParser):
     """
     Verify signature of binary result and get version, columns information
     """
+
     def sanity_check(self):
         data = self._fp.read(12)
-        sign, version, columns = struct.unpack('>4sii',data)
+        sign, version, columns = struct.unpack('>4sii', data)
         if sign != 'BRTR':
             raise Exception("Invalid signature: %s" % sign)
 
@@ -529,12 +541,12 @@ class BinaryTableResultParser(ResultParser):
             elif record_type_marker == self.RT_DATATYPE_LITERAL:
                 value = self.read_atom()
                 b = self.read_byte()
-                if b ==self.RT_QNAME:
+                if b == self.RT_QNAME:
                     ord = self.read_int()
                     localname = self.read_atom()
                     self.add(Literal(value, namespaces[ord] + localname))
                     added = True
-                elif b ==self.RT_URI:
+                elif b == self.RT_URI:
                     iri = self.read_atom()
                     self.add(Literal(value, iri))
                     added = True

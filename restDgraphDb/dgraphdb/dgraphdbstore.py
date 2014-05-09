@@ -3,7 +3,6 @@ __author__ = 'mpetyx'
 from rdflib import Graph
 
 # import rdflib.plugin
-from rdflib import ConjunctiveGraph
 from django.conf import settings
 import datetime
 import os
@@ -16,12 +15,13 @@ def random_file_generating():
     filename = "_".join([basename, middle, suffix])
     return filename
 
+
 class DeepGraphStore():
     store_name = settings.DEEPGRAPHS_DEFAULT_STORAGE
 
     def __init__(self, create=True):
         self.create = create
-        self.path = "databases/"+random_file_generating()
+        self.path = "databases/" + random_file_generating()
 
     def setUp(self):
         self.graph = Graph(store=self.store_name)
@@ -31,7 +31,7 @@ class DeepGraphStore():
             self.graph.parse("http://njh.me/foaf.rdf", format='xml')
             self.graph.commit()
 
-    def open(self,path):
+    def open(self, path):
         self.graph = Graph(self.store_name).open(path, False)
         return self.graph.__len__
 

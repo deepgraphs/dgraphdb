@@ -9,14 +9,15 @@ from restDgraphDb.authorization import user_authorized_for_method
 from restDgraphDb.models import KnowledgeBase
 from dgraphdb.dgraphdbstore import DeepGraphStore
 
+
 def user_auhorized(user):
     user_authorized_for_method(user)
     return 1
 
 
 def admin_rights_on_knowledge_base(user, kb):
-
     return 1
+
 
 @login_required
 @user_passes_test(user_auhorized)
@@ -33,7 +34,7 @@ def kb_size(request, kb):
         # store.setUp()
         size = store.size()
 
-        return HttpResponse("The size of kb %s is %d"%(kb,size))
+        return HttpResponse("The size of kb %s is %d" % (kb, size))
     else:
         return HttpResponseForbidden()
 

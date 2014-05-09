@@ -115,11 +115,11 @@ Create a new database.
     if request.method == 'GET':
         knowledge_bases = KnowledgeBase.objects.all()
 
-        return HttpResponse( knowledge_bases)
+        return HttpResponse(knowledge_bases)
     elif request.method == 'POST':
-        new_database = KnowledgeBase(owner = request.user,storageName="", description="")
+        new_database = KnowledgeBase(owner=request.user, storageName="", description="")
         new_database.save()
-        return HttpResponse( "Created with id %d"%new_database.id)
+        return HttpResponse("Created with id %d" % new_database.id)
     else:
         return HttpResponseForbidden()
 
@@ -419,7 +419,7 @@ Return whether or not a user is a superuser.
 
     if request.method == 'GET':
         current_user = User.objects.get(user=user)
-        return HttpResponse( {"status": current_user.is_superuser})
+        return HttpResponse({"status": current_user.is_superuser})
     else:
         return HttpResponseForbidden()
 

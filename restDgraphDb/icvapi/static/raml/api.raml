@@ -1,0 +1,47 @@
+#%RAML 0.8
+title: stardog internal consistency verification api
+version: v0.2
+baseUri: http://0.0.0.0:582/api/{version}
+
+/{kb}/icv:
+  /add:
+    post:
+      description: Add a new integrity constraint to the database.
+  /remove:
+    post:
+      description: Remove an existing integrity constraint from the database.
+  /clear:
+    post:
+      description: Clears all integrity constraints from the database.
+  /validate:
+    post:
+      description: Accepts integrity constraints as RDF and checks to see if they are valid
+      queryParameters:
+        graphuri:
+          example: 34
+  /violations:
+    post:
+      description: Accepts integrity constraints as RDF and returns the violation explanations, if any, as RDF.
+      queryParameters:
+        graphuri:
+          example: 34
+  /convert:
+    post:
+      description: Accepts a single integrity constraint as RDF an returns the equivalent SPARQL query.
+      queryParameters:
+        graphuri: 
+    /{tid}:
+      uriParameters:
+        tid:
+      /violations:
+        post:
+          description: Accepts integrity constraints as RDF and returns the violation explanations, if any, as RDF. IC validation & violation detection is performed within the context of the provided transaction.
+
+          queryParameters:
+            graphuri: 
+      /validate:
+        post:
+          description: Accepts integrity constraints as RDF and checks to see if they are valid within the specified transaction
+          queryParameters:
+            graphuri: 
+      

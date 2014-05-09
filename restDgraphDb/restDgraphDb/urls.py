@@ -13,5 +13,5 @@ urlpatterns = patterns('',
                        url('^coreapi/', include('coreapi.urls')),
                        url('^adminapi/', include('adminapi.urls')),
                        url('^reasoningapi', include('reasoningapi.urls')),
-                       url('^adminapi/',include('adminapi.urls')),
+                       url('^adminapi/', include('adminapi.urls')),
 )
